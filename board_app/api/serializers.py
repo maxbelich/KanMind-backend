@@ -33,3 +33,21 @@ class BoardListSerializer(serializers.ModelSerializer):
 
     def get_tasks_high_prio_count(self, board):
         return 0
+
+class UserShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'fullname']
+
+
+class BoardDetailSerializer(serializers.ModelSerializer):
+    owner_id = serializers.IntegerField(read_only=True)
+    members = UserShortSerializer(many=True, read_only=True)
+    tasks = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Board
+        fields = ['id', 'title', 'owner_id', 'members', 'tasks']
+
+    def get_tasks(self, board):
+        return []
