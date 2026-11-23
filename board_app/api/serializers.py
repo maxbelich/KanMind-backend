@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from board_app.models import Board
 from user_auth_app.models import User
+from user_auth_app.api.serializers import UserShortSerializer
 
 
 class BoardListSerializer(serializers.ModelSerializer):
@@ -33,12 +34,6 @@ class BoardListSerializer(serializers.ModelSerializer):
 
     def get_tasks_high_prio_count(self, board):
         return 0
-
-class UserShortSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'email', 'fullname']
-
 
 class BoardDetailSerializer(serializers.ModelSerializer):
     owner_id = serializers.IntegerField(read_only=True)
