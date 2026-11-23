@@ -3,7 +3,8 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
 from board_app.models import Board
-from .serializers import BoardListSerializer, BoardDetailSerializer
+from .serializers import BoardListSerializer, BoardDetailSerializer,\
+    BoardUpdateSerializer
 from .permissions import IsBoardOwnerOrMember
 
 
@@ -19,7 +20,12 @@ class BoardListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-class BoardDetailView(generics.RetrieveAPIView):
+class BoardDetailView(generics.RetrieveUpdateAPIView):
     queryset = Board.objects.all()
-    serializer_class = BoardDetailSerializer
     permission_classes = [IsAuthenticated, IsBoardOwnerOrMember]
+    http_method_names = ['get', 'patch', 'head', 'options']
+
+    def get_serializer_class(self):
+        if self.request.method == 'PATCH':
+            return BoardUpdateSerializer
+        return BoardDetailSerializer
