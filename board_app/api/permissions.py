@@ -6,4 +6,6 @@ class IsBoardOwnerOrMember(BasePermission):
         user = request.user
         if board.owner == user:
             return True
+        if request.method == 'DELETE':
+            return False
         return board.members.filter(pk=user.pk).exists()
