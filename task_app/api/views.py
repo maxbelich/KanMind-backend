@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
@@ -22,3 +23,23 @@ class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method == 'PATCH':
             return TaskUpdateSerializer
         return TaskSerializer
+
+
+class TaskAssignedToMeView(generics.ListAPIView):
+    serializer_class = TaskSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Task.objects.filter(Q(assignee=user) &
+                                  (Q(board__owner=user) |
+                                   Q(board__members=user))).distinct()
+
+
+class TaskReviewingView(generics.ListAPIView):
+    serializer_class = TaskSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Task.objects.filter(Q(reviewer=user) &
+                                  (Q(board__owner=user) |
+                                   Q(board__members=user))).distinct()
