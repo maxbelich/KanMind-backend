@@ -36,7 +36,10 @@ class TaskSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        board = attrs['board']
+        if self.instance:
+            board = self.instance.board
+        else:
+            board = attrs['board']
         user = self.context['request'].user
         if not is_board_member(board, user):
             raise PermissionDenied("You're not a member of this board. "
@@ -49,3 +52,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def get_comments_count(self, task):
         return 0
+
+
+class TaskUpdateSerializer(TaskSerializer):
+    board = serializers.PrimaryKeyRelatedField(read_only=True)
